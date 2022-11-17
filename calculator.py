@@ -128,7 +128,7 @@ else:
     delta_x_list.insert(0, 0)
     delta_x_list = delta_x_list[:-1]
 
-    print(delta_x_list)
+    # print(delta_x_list)
     # visualize the data
     fig, ax = plt.subplots()
     plt.xticks(delta_x_list)
