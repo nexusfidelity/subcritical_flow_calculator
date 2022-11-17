@@ -14,11 +14,16 @@ col1, col2, col3 = st.columns([1, 1, 3])
 
 #initial variable
 with col1:
-    n = st.number_input('n',value=0.02)
-    slope = st.number_input('ib',value=float(1/1000),step=5.0)
-    B = st.number_input('B',value=200.0)
-    x = st.number_input('x',value=5000)
-    delta_x = st.number_input('delta_x',value=500)
+    n = st.number_input('n, Manning Roughness',value=0.02)
+    st.text("n = " + str(n))
+    slope = st.number_input('ib, Bed Slope',value=0.001)
+    st.text("ib = " + str(slope))
+    B = st.number_input('B, Channel Width (m)',value=200.0)
+    st.text("B = " + str(B))
+    x = st.number_input('x, Distance (m)',value=5000)
+    st.text("x = " + str(x))
+    delta_x = st.number_input('delta_x, (m)',value=500)
+    st.text("delta_x = " + str(delta_x))
 # n = 0.02
 # slope = float(1/1000)
 # B = 200.0
@@ -26,9 +31,12 @@ with col1:
 #initial at downstream
 
 with col2:
-    q = st.number_input('Q',value=2000.0)
-    h2 = st.number_input('h2',value=5)
-    z2 = st.number_input('z2',value=0.0)
+    q = st.number_input('Q, Discharge (m³/s)',value=2000.0)
+    st.text("Q = " + str(q))
+    h2 = st.number_input('h2, Depth at Downstream Section (m)',value=5)
+    st.text("h2 = " + str(h2))
+    z2 = st.number_input('z2, Bed Height at Downstream Section (m)',value=0.0)
+    st.text("z2 = " + str(z2))
 # q = 2000.0
 # h2 = 5
 # z2 = 0.0
@@ -53,6 +61,7 @@ if x%delta_x != 0:
 else:
     river_bed.append(z2)
     river_height.append(h2)
+    # delta_x_list.append(0)
     delta_x_list.append(delta_x)
     i=x/delta_x
     
@@ -60,7 +69,7 @@ else:
     Ø2 = -(q**2)*((n**2)*(x_increment))/(2*(B**2))
     
     
-    for x in range(int(i)-1):
+    for x in range(int(i)):
         z = slope*delta_x
         river_bed.append(z)
         delta_x = delta_x + x_increment
@@ -115,28 +124,66 @@ else:
     # print(river_bed)
     # print(uniform_flow)
     
+    #delta_x manipulation
+    delta_x_list.insert(0, 0)
+    delta_x_list = delta_x_list[:-1]
+
+    print(delta_x_list)
     # visualize the data
     fig, ax = plt.subplots()
-    plt.plot(delta_x_list,river_bed, label = "riverbed")
+    plt.xticks(delta_x_list)
+    plt.plot(delta_x_list,river_bed, label = "riverbed",color = "brown", scalex=False)
     # plt.plot(delta_x_list,uniform_flow, label = "uniform_flow_depth")
-    plt.plot(delta_x_list,total_height, linestyle = 'dotted')
+    plt.plot(delta_x_list,total_height, linestyle = 'dotted', color = "blue")
     # plt.show()
+    plt.title('Profile of Water Surface (Blue Dotted Line) & Bed Height (Brown Line)')
+    plt.xlabel("Distance, x (Meters)")
+    plt.ylabel("Bed Height, Z + Depth, h (Meters)")
+    
+    
     
 with col3:
     
     st.pyplot(fig)
 
+    
+
 def load_data():
     return pd.DataFrame(
         {
+            "delta_x": delta_x_list,
             "riverbed height": river_bed,
             "true h at each interval": river_height,
             "total height":total_height
         }
     )
 
+st.write('<br>',unsafe_allow_html=True)
+
+col1, col2 = st.columns([2, 3])
+
 # Boolean to resize the dataframe, stored as a session state variable
 # st.checkbox("Use container width", value=False, key="use_container_width")
 
 df = load_data()
-st.dataframe(df)
+
+with col1:
+
+    st.text("Summary of Calculated Values at " +str(i)+" Times Procedures")
+    st.dataframe(df)
+
+@st.cache
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
+
+csv = convert_df(df)
+
+with col2:
+
+    st.download_button(
+        label="Download data",
+        data=csv,
+        file_name='table.csv',
+        mime='text/csv',
+    )
