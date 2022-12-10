@@ -50,10 +50,13 @@ h1_assumption = 5
 # delta_x = 500.0
 x_increment = delta_x
 
+
+
 delta_x_list=[]
 river_bed = []
 river_height = []
 uniform_flow = []
+critical_flow = []
 Ø3_list = []
 
 if x%delta_x != 0:
@@ -117,9 +120,13 @@ else:
     from operator import add
     total_height = list(map(add, river_bed, river_height) )
     
-    # import math
-    # uniform_flow_depth = ((q*n)/B*(math.sqrt(slope)))**(3/5)
-    # uniform_flow = [x+uniform_flow_depth for x in river_bed]
+    import math
+    uniform_flow_depth = ((q*n)/(B*(math.sqrt(slope))))**(3/5)
+    critical_flow_depth = ((q**2)/(g*(B**2)))**(1/3)
+    
+    
+    uniform_flow = [x+uniform_flow_depth for x in river_bed]
+    critical_flow = [x+critical_flow_depth for x in river_bed]
     
     # print(river_bed)
     # print(uniform_flow)
@@ -132,9 +139,12 @@ else:
     # visualize the data
     fig, ax = plt.subplots()
     plt.xticks(delta_x_list)
-    plt.plot(delta_x_list,river_bed, label = "riverbed",color = "brown", scalex=False)
-    # plt.plot(delta_x_list,uniform_flow, label = "uniform_flow_depth")
+    plt.plot(delta_x_list,river_bed, color = "brown", scalex=False)
+    plt.plot(delta_x_list,uniform_flow, color = "yellow")
+    plt.plot(delta_x_list,critical_flow, color = "green")
     plt.plot(delta_x_list,total_height, linestyle = 'dotted', color = "blue")
+    
+
     # plt.show()
     plt.title('Profile of Water Surface (Blue Dotted Line) & Bed Height (Brown Line)')
     plt.xlabel("Distance, x (Meters)")
@@ -154,13 +164,15 @@ def load_data():
             "delta_x": delta_x_list,
             "riverbed height": river_bed,
             "true h at each interval": river_height,
+            "uniform flow depth": uniform_flow,
+            "critical flow depth": critical_flow,
             "total height":total_height
         }
     )
 
 st.write('<br>',unsafe_allow_html=True)
 
-col1, col2 = st.columns([2, 3])
+col1, col2 = st.columns([3, 2])
 
 # Boolean to resize the dataframe, stored as a session state variable
 # st.checkbox("Use container width", value=False, key="use_container_width")
@@ -187,3 +199,10 @@ with col2:
         file_name='table.csv',
         mime='text/csv',
     )
+    
+    
+    st.subheader("")
+    st.subheader("Critical Flow Depth, hc (Meter)")
+    st.write(critical_flow_depth)
+    st.subheader("Normal / Uniform Flow Depth, ho (Meter)")
+    st.write(uniform_flow_depth)
