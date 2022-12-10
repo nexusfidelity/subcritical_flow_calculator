@@ -139,11 +139,12 @@ else:
     # visualize the data
     fig, ax = plt.subplots()
     plt.xticks(delta_x_list)
-    plt.plot(delta_x_list,river_bed, color = "brown", scalex=False)
+    plt.plot(delta_x_list,river_bed, label = "river bed",color = "brown", scalex=False)
     plt.plot(delta_x_list,uniform_flow, color = "yellow")
     plt.plot(delta_x_list,critical_flow, color = "green")
     plt.plot(delta_x_list,total_height, linestyle = 'dotted', color = "blue")
-    
+    plt.legend(['river bed','uniform flow', 'critical flow','water surface' ])
+
 
     # plt.show()
     plt.title('Profile of Water Surface (Blue Dotted Line) & Bed Height (Brown Line)')
