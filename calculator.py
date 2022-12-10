@@ -147,7 +147,7 @@ else:
 
 
     # plt.show()
-    plt.title('Profile of Water Surface (Blue Dotted Line) & Bed Height (Brown Line)')
+    plt.title('Profile of Water Surface')
     plt.xlabel("Distance, x (Meters)")
     plt.ylabel("Bed Height, Z + Depth, h (Meters)")
     
